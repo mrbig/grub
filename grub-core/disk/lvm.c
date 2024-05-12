@@ -56,6 +56,31 @@ grub_lvm_getvalue (const char ** const p, const char *str)
   return grub_strtoull (*p, p, 10);
 }
 
+/* Find the given closing character but take care of possible nesting.
+   For example, if we are looking for '}' and the string
+   is "foo bar { baz } }", this function will return the position
+  of the last '}' character. */
+static char *
+grub_lvm_find_closing (const char *s, int close_c, int open_c)
+{
+  int nesting = 1;
+
+  do
+    {
+      if (*s == close_c) {
+        if (--nesting <= 0) {
+          return (char *) s;
+        }
+      }
+      if (*s == open_c) {
+        nesting++;
+      }
+    }
+  while (*s++);
+
+  return 0;
+}
+
 #if 0
 static int
 grub_lvm_checkvalue (char **p, char *str, char *tmpl)
@@ -937,7 +962,7 @@ grub_lvm_detect (grub_disk_t disk,
 		}
 
 	      if (p != NULL)
-		p = grub_strchr (p, '}');
+		p = grub_lvm_find_closing(p, '}', '{');
 	      if (p == NULL)
 		goto lvs_fail;
 	      p += 3;
