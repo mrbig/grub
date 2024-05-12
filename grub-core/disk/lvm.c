@@ -358,6 +358,9 @@ grub_lvm_detect (grub_disk_t disk,
       if (! vg)
 	goto fail3;
       vg->name = vgname;
+#ifdef GRUB_UTIL
+      grub_util_info ("Parsing volume group %s", vg->name);
+#endif
       vg->uuid = grub_malloc (GRUB_LVM_ID_STRLEN);
       if (! vg->uuid)
 	goto fail3;
@@ -555,6 +558,9 @@ grub_lvm_detect (grub_disk_t disk,
 			     p, GRUB_LVM_ID_STRLEN);
 		lv->idname[sizeof ("lvmid/") - 1 + 2 * GRUB_LVM_ID_STRLEN + 1] = '\0';
 	      }
+#ifdef GRUB_UTIL
+	      grub_util_info ("Found logical volume %s", lv->name);
+#endif
 
 	      lv->size = 0;
 
@@ -969,6 +975,9 @@ grub_lvm_detect (grub_disk_t disk,
 
 	      if (skip_lv)
 		{
+#ifdef GRUB_UTIL
+		  grub_util_info("Skipping logical volume %s", lv->name);
+#endif
 		  grub_free (lv->name);
 		  grub_free (lv);
 		  continue;
